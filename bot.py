@@ -126,5 +126,40 @@ def list_bus_stops(message):
         reply = "No buses or bus stops added. /add to start tracking buses."
     bot.send_message(message.chat.id, reply)
 
+
+@bot.message_handler(commands=['deleteBusStop'])
+def delete_bus_stop(message):
+    user_id = str(message.from_user.id)
+    string = "Which bus stop(s) would you like to remove?\n"
+
+    with shelve.open('busDB') as db:
+        for bus_stop in db[user_id]:
+            string += f"{bus_stop}\n"
+
+
+    markup = types.ForceReply(selective=False)
+    sent = bot.send_message(message.chat.id, string, reply_markup=markup)
+    bot.register_next_step_handler(sent, process_delete_bus_stop)
+
+def process_delete_bus_stop(reply):
+    bus_stop_raw = reply.text
+    bus_stops = bus_stop_raw.split()
+    
+    user_id = str(reply.from_user.id)
+    deleted_string = ""
+    with shelve.open('busDB', writeback=True) as db:
+        for bus_stop in bus_stops:
+            try:
+                del db[user_id][bus_stop] #deletes the whole busstop
+                deleted_string += bus_stop
+                deleted_string += " "
+            except Exception as e:
+                print(f"Failed to delete bus stop {bus_stop}, {e}")
+    if (deleted_string != ""):
+        bot.send_message(reply.chat.id, f"Successfully deleted bus stop(s): {deleted_string}")
+    else:
+        bot.send_message(reply.chat.id, f"No bus stops were modified, key error?")
+
+
 if __name__ == "__main__":
     main()

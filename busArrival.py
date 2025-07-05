@@ -63,10 +63,15 @@ def getBusTiming(response, busStopCode, busServiceNo):
             # if (nextBus == "" or nextBus == None):
             #     return "No bus information available"
 
-            eta_iso = datetime.fromisoformat(nextBus["EstimatedArrival"])
-            nextBusArrivalTime = getMinutesToArrival(eta_iso)
-            eta_iso2 = datetime.fromisoformat(nextBus2["EstimatedArrival"])
-            nextBus2ArrivalTime = getMinutesToArrival(eta_iso2) 
+            # need to try catch this entire block
+            try:
+                eta_iso = datetime.fromisoformat(nextBus["EstimatedArrival"])
+                nextBusArrivalTime = getMinutesToArrival(eta_iso)
+                eta_iso2 = datetime.fromisoformat(nextBus2["EstimatedArrival"])
+                nextBus2ArrivalTime = getMinutesToArrival(eta_iso2) 
+            except Exception as e:
+                return f"No bus information available, {e}"
+
 
             if (nextBusArrivalTime < 1):
                 return f"Bus {busServiceNo} is arriving\nNext bus is coming in {nextBus2ArrivalTime} mins.\n"

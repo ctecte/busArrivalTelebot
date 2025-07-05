@@ -1,17 +1,4 @@
-x = 0
+import shelve
 
-def baz():
-    print(x)
-
-def foo():
-    global x
-    x = 2
-    print(x)
-
-def bar():
-    print(x)
-
-baz()
-foo()
-bar()
-
+with shelve.open('busDB') as db:
+    print(db)
